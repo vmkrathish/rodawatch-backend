@@ -36,7 +36,7 @@ class PasswordChange(BaseModel):
 def _build_img_url(path: Optional[str]) -> Optional[str]:
     if not path:
         return None
-    return f"http://localhost:{settings.APP_PORT}/{path.lstrip('/')}"
+    return f"http://roadwatch-api.onrender.com/{path.lstrip('/')}"
 
 
 @router.get("/me")
