@@ -44,6 +44,7 @@ class UserOut(BaseModel):
     district_id: Optional[int] = None
     is_verified: bool
     is_active: bool
+    profile_image: Optional[str] = None   # relative path — frontend builds full URL
     created_at: Optional[datetime] = None
     class Config:
         from_attributes = True

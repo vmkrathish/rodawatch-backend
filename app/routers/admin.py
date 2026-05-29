@@ -22,7 +22,7 @@ def _require_admin(current_user: User):
 
 
 # ── User Management ───────────────────────────────────────────
-@router.get("/users", response_model=List[UserOut])
+@router.get("/users")          # FIX: removed response_model — returns plain dict so profile_image is never stripped
 def list_users(
     role: Optional[str] = Query(None),
     is_active: Optional[bool] = Query(None),
@@ -43,7 +43,24 @@ def list_users(
             User.email.ilike(f"%{search}%") |
             User.phone.ilike(f"%{search}%")
         )
-    return q.order_by(User.created_at.desc()).offset(skip).limit(limit).all()
+    users = q.order_by(User.created_at.desc()).offset(skip).limit(limit).all()
+    # Explicit dict — profile_image always included regardless of Pydantic schema version
+    return [
+        {
+            "id": u.id,
+            "full_name": u.full_name,
+            "phone": u.phone,
+            "email": u.email,
+            "role": u.role,
+            "contractor_company": u.contractor_company,
+            "district_id": u.district_id,
+            "is_verified": u.is_verified,
+            "is_active": u.is_active,
+            "profile_image": u.profile_image,   # relative path e.g. "uploads/profiles/profile_2_abc.jpg"
+            "created_at": str(u.created_at) if u.created_at else None,
+        }
+        for u in users
+    ]
 
 
 @router.get("/users/{user_id}", response_model=UserOut)
